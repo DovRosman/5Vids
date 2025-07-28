@@ -8,8 +8,6 @@ Have you ever found yourself falling down a YouTube rabbit hole for hours on end
 
 This extension was born out of that frustration. I wanted to stop mindless binge-watching while still allowing for focused, productive sessions on YouTube. Instead of a blanket time limit, **5Vids** sets a daily quota on the *quantity* of videos you watch, helping you be more intentional with your viewing choices.
 
-This project was built with the assistance of AI, demonstrating a modern workflow for rapid tool development.
-
 ## What It Does
 
 This extension is designed to be a mindful gatekeeper for your YouTube watching habits. When you land on a new YouTube video, an overlay will appear, asking if you want to "count" the video towards your daily limit of five.
