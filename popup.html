@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>YouTube Limit</title>
+        <link
+            href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap"
+            rel="stylesheet"
+        />
+        <style>
+            :root {
+                --bg-primary: #121212;
+                --bg-secondary: #1f2937;
+                --bg-tertiary: #374151;
+                --text-primary: #ffffff;
+                --text-secondary: #e5e7eb;
+                --text-muted: #9ca3af;
+                --accent: #3b82f6;
+                --accent-hover: #2563eb;
+                --danger: #ef4444;
+                --success: #10b981;
+                --border: #374151;
+                --shadow: rgba(0, 0, 0, 0.3);
+            }
+
+            [data-theme="light"] {
+                --bg-primary: #ffffff;
+                --bg-secondary: #f9fafb;
+                --bg-tertiary: #f3f4f6;
+                --text-primary: #111827;
+                --text-secondary: #374151;
+                --text-muted: #6b7280;
+                --accent: #3b82f6;
+                --accent-hover: #2563eb;
+                --danger: #ef4444;
+                --success: #059669;
+                --border: #e5e7eb;
+                --shadow: rgba(0, 0, 0, 0.1);
+            }
+
+            * {
+                box-sizing: border-box;
+            }
+
+            body {
+                font-family: "Inter", sans-serif;
+                width: 380px;
+                background-color: var(--bg-primary);
+                color: var(--text-primary);
+                margin: 0;
+                padding: 1.5rem;
+                transition: all 0.3s ease;
+            }
+
+            .header {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                margin-bottom: 1.5rem;
+                padding-bottom: 1rem;
+                border-bottom: 1px solid var(--border);
+            }
+
+            .header h1 {
+                font-size: 1.375rem;
+                font-weight: 700;
+                color: var(--text-primary);
+                margin: 0;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .youtube-icon {
+                width: 24px;
+                height: 24px;
+                color: var(--danger);
+            }
+
+            .count-display {
+                text-align: right;
+            }
+
+            #video-count {
+                font-size: 2rem;
+                font-weight: 700;
+                color: var(--danger);
+                line-height: 1;
+            }
+
+            .count-display span {
+                font-size: 0.875rem;
+                color: var(--text-muted);
+                font-weight: 500;
+            }
+
+            .controls {
+                display: flex;
+                gap: 1rem;
+                margin-bottom: 1.5rem;
+                align-items: center;
+                justify-content: space-between;
+            }
+
+            .toggle-container {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+            }
+
+            .toggle {
+                position: relative;
+                width: 48px;
+                height: 24px;
+                background-color: var(--bg-tertiary);
+                border-radius: 12px;
+                cursor: pointer;
+                transition: background-color 0.3s ease;
+                border: 1px solid var(--border);
+            }
+
+            .toggle.active {
+                background-color: var(--success);
+            }
+
+            .toggle-slider {
+                position: absolute;
+                top: 2px;
+                left: 2px;
+                width: 18px;
+                height: 18px;
+                background-color: var(--text-primary);
+                border-radius: 50%;
+                transition: transform 0.3s ease;
+                box-shadow: 0 2px 4px var(--shadow);
+            }
+
+            .toggle.active .toggle-slider {
+                transform: translateX(24px);
+            }
+
+            .toggle-label {
+                font-size: 0.875rem;
+                font-weight: 500;
+                color: var(--text-secondary);
+            }
+
+            .theme-toggle {
+                background: none;
+                border: 1px solid var(--border);
+                color: var(--text-secondary);
+                padding: 0.5rem;
+                border-radius: 0.5rem;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+            .theme-toggle:hover {
+                background-color: var(--bg-secondary);
+                color: var(--text-primary);
+            }
+
+            .theme-icon {
+                width: 18px;
+                height: 18px;
+            }
+
+            .list-container {
+                background-color: var(--bg-secondary);
+                border-radius: 0.75rem;
+                padding: 1rem;
+                border: 1px solid var(--border);
+                box-shadow: 0 1px 3px var(--shadow);
+            }
+
+            .list-container h2 {
+                font-size: 1.125rem;
+                font-weight: 600;
+                color: var(--text-primary);
+                margin: 0 0 0.75rem 0;
+                display: flex;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .list-icon {
+                width: 18px;
+                height: 18px;
+                color: var(--accent);
+            }
+
+            .video-list {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+                display: flex;
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+
+            .video-item {
+                display: flex;
+                align-items: center;
+                gap: 0.75rem;
+                padding: 0.75rem;
+                background-color: var(--bg-primary);
+                border-radius: 0.5rem;
+                border: 1px solid var(--border);
+                transition: all 0.2s ease;
+            }
+
+            .video-item:hover {
+                transform: translateY(-1px);
+                box-shadow: 0 2px 8px var(--shadow);
+            }
+
+            .video-number {
+                background-color: var(--accent);
+                color: white;
+                width: 24px;
+                height: 24px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.75rem;
+                font-weight: 600;
+                flex-shrink: 0;
+            }
+
+            .video-link {
+                color: var(--text-secondary);
+                text-decoration: none;
+                flex: 1;
+                font-size: 0.875rem;
+                line-height: 1.4;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                transition: color 0.2s ease;
+            }
+
+            .video-link:hover {
+                color: var(--accent);
+            }
+
+            .delete-btn {
+                background: none;
+                border: none;
+                color: var(--text-muted);
+                cursor: pointer;
+                padding: 0.25rem;
+                border-radius: 0.25rem;
+                transition: all 0.2s ease;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                flex-shrink: 0;
+            }
+
+            .delete-btn:hover {
+                color: var(--danger);
+                background-color: var(--bg-tertiary);
+            }
+
+            .delete-icon {
+                width: 16px;
+                height: 16px;
+            }
+
+            .message {
+                font-size: 0.875rem;
+                color: var(--text-muted);
+                text-align: center;
+                padding: 2rem 1rem;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 0.5rem;
+            }
+
+            .empty-icon {
+                width: 48px;
+                height: 48px;
+                color: var(--text-muted);
+                opacity: 0.5;
+            }
+
+            .status-bar {
+                margin-top: 1rem;
+                padding: 0.75rem;
+                border-radius: 0.5rem;
+                font-size: 0.875rem;
+                text-align: center;
+                font-weight: 500;
+            }
+
+            .status-enabled {
+                background-color: rgba(16, 185, 129, 0.1);
+                color: var(--success);
+                border: 1px solid rgba(16, 185, 129, 0.2);
+            }
+
+            .status-disabled {
+                background-color: rgba(107, 114, 128, 0.1);
+                color: var(--text-muted);
+                border: 1px solid rgba(107, 114, 128, 0.2);
+            }
+
+            .progress-bar {
+                width: 100%;
+                height: 6px;
+                background-color: var(--bg-tertiary);
+                border-radius: 3px;
+                overflow: hidden;
+                margin-bottom: 1rem;
+            }
+
+            .progress-fill {
+                height: 100%;
+                background: linear-gradient(
+                    90deg,
+                    var(--success),
+                    var(--danger)
+                );
+                border-radius: 3px;
+                transition: width 0.3s ease;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="header">
+            <h1>
+                <svg
+                    class="youtube-icon"
+                    fill="currentColor"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"
+                    />
+                </svg>
+                Daily Limit
+            </h1>
+            <div class="count-display">
+                <span id="video-count">0</span>
+                <span>/ 5</span>
+            </div>
+        </div>
+
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress-fill"></div>
+        </div>
+
+        <div class="controls">
+            <div class="toggle-container">
+                <div class="toggle" id="extension-toggle">
+                    <div class="toggle-slider"></div>
+                </div>
+                <span class="toggle-label">Extension</span>
+            </div>
+            <button class="theme-toggle" id="theme-toggle" title="Toggle theme">
+                <svg
+                    class="theme-icon"
+                    id="theme-icon"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"
+                    />
+                </svg>
+            </button>
+        </div>
+
+        <div class="list-container">
+            <h2>
+                <svg
+                    class="list-icon"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.121 2.122"
+                    />
+                </svg>
+                Today's Videos
+            </h2>
+            <ol class="video-list" id="video-list"></ol>
+            <div id="no-videos-message" class="message">
+                <svg
+                    class="empty-icon"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m3 6V8a2 2 0 00-2-2H6a2 2 0 00-2 2v8a2 2 0 002 2h4"
+                    />
+                    <path
+                        stroke-linecap="round"
+                        stroke-linejoin="round"
+                        stroke-width="2"
+                        d="M15 17l2 2 4-4"
+                    />
+                </svg>
+                <span>No videos watched yet today</span>
+            </div>
+        </div>
+
+        <div class="status-bar" id="status-bar">Extension is active</div>
+
+        <script src="popup.js"></script>
+    </body>
+</html>

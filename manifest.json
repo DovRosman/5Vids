@@ -1,0 +1,27 @@
+{
+  "manifest_version": 3,
+  "name": "YouTube Daily Limit",
+  "version": "1.0",
+  "description": "Limits the number of YouTube videos you can watch to 5 per day.",
+  "permissions": ["storage", "tabs", "webNavigation", "scripting"],
+  "host_permissions": ["*://*.youtube.com/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": ["*://*.youtube.com/*"],
+      "js": ["content-script.js"],
+      "run_at": "document_end"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": ["block.html"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}
