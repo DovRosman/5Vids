@@ -10,18 +10,18 @@
         />
         <style>
             :root {
-                --bg-primary: #121212;
-                --bg-secondary: #1f2937;
-                --bg-tertiary: #374151;
+                --bg-primary: #0f0f0f;
+                --bg-secondary: #212121;
+                --bg-tertiary: #383838;
                 --text-primary: #ffffff;
-                --text-secondary: #e5e7eb;
-                --text-muted: #9ca3af;
-                --accent: #3b82f6;
-                --accent-hover: #2563eb;
-                --danger: #ef4444;
+                --text-secondary: #aaaaaa;
+                --text-muted: #717171;
+                --accent: #cc0000;
+                --accent-hover: #990000;
+                --danger: #ff4d4d;
                 --success: #10b981;
-                --border: #374151;
-                --shadow: rgba(0, 0, 0, 0.3);
+                --border: #272727;
+                --shadow: rgba(0, 0, 0, 0.5);
             }
 
             [data-theme="light"] {
@@ -31,8 +31,8 @@
                 --text-primary: #111827;
                 --text-secondary: #374151;
                 --text-muted: #6b7280;
-                --accent: #3b82f6;
-                --accent-hover: #2563eb;
+                --accent: #cc0000;
+                --accent-hover: #990000;
                 --danger: #ef4444;
                 --success: #059669;
                 --border: #e5e7eb;
@@ -45,7 +45,7 @@
 
             body {
                 font-family: "Inter", sans-serif;
-                width: 380px;
+                width: 420px;
                 background-color: var(--bg-primary);
                 color: var(--text-primary);
                 margin: 0;
@@ -75,7 +75,7 @@
             .youtube-icon {
                 width: 24px;
                 height: 24px;
-                color: var(--danger);
+                color: var(--accent);
             }
 
             .count-display {
@@ -169,12 +169,65 @@
                 height: 18px;
             }
 
+            .progress-bar {
+                width: 100%;
+                height: 6px;
+                background-color: var(--bg-tertiary);
+                border-radius: 3px;
+                overflow: hidden;
+                margin-bottom: 1rem;
+            }
+
+            .progress-fill {
+                height: 100%;
+                background: linear-gradient(
+                    90deg,
+                    var(--success),
+                    var(--danger)
+                );
+                border-radius: 3px;
+                transition: width 0.3s ease;
+            }
+
+            .tabs {
+                display: flex;
+                gap: 0.5rem;
+                margin-bottom: 1rem;
+                background-color: var(--bg-secondary);
+                border-radius: 0.5rem;
+                padding: 0.25rem;
+            }
+
+            .tab {
+                flex: 1;
+                padding: 0.5rem 1rem;
+                border: none;
+                background: none;
+                color: var(--text-muted);
+                border-radius: 0.25rem;
+                cursor: pointer;
+                font-weight: 500;
+                font-size: 0.875rem;
+                transition: all 0.2s ease;
+            }
+
+            .tab.active {
+                background-color: var(--bg-tertiary);
+                color: white;
+            }
+
+            .tab:hover:not(.active) {
+                color: var(--text-primary);
+                background-color: var(--bg-tertiary);
+            }
+
             .list-container {
                 background-color: var(--bg-secondary);
                 border-radius: 0.75rem;
                 padding: 1rem;
                 border: 1px solid var(--border);
                 box-shadow: 0 1px 3px var(--shadow);
+                min-height: 200px;
             }
 
             .list-container h2 {
@@ -216,10 +269,34 @@
             .video-item:hover {
                 transform: translateY(-1px);
                 box-shadow: 0 2px 8px var(--shadow);
+                border-color: var(--bg-tertiary);
+            }
+
+            .video-thumbnail {
+                width: 60px;
+                height: 45px;
+                border-radius: 4px;
+                object-fit: cover;
+                flex-shrink: 0;
+                border: 1px solid var(--border);
             }
 
             .video-number {
                 background-color: var(--accent);
+                color: white;
+                width: 24px;
+                height: 24px;
+                border-radius: 50%;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 0.75rem;
+                font-weight: 600;
+                flex-shrink: 0;
+            }
+
+            .bank-number {
+                background-color: var(--success);
                 color: white;
                 width: 24px;
                 height: 24px;
@@ -249,7 +326,7 @@
                 color: var(--accent);
             }
 
-            .delete-btn {
+            .action-btn {
                 background: none;
                 border: none;
                 color: var(--text-muted);
@@ -263,12 +340,19 @@
                 flex-shrink: 0;
             }
 
-            .delete-btn:hover {
-                color: var(--danger);
+            .action-btn:hover {
                 background-color: var(--bg-tertiary);
             }
 
-            .delete-icon {
+            .delete-btn:hover {
+                color: var(--danger);
+            }
+
+            .watch-btn:hover {
+                color: var(--success);
+            }
+
+            .action-icon {
                 width: 16px;
                 height: 16px;
             }
@@ -312,24 +396,26 @@
                 border: 1px solid rgba(107, 114, 128, 0.2);
             }
 
-            .progress-bar {
-                width: 100%;
-                height: 6px;
-                background-color: var(--bg-tertiary);
-                border-radius: 3px;
-                overflow: hidden;
-                margin-bottom: 1rem;
+            .bank-stats {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 0.75rem;
+                padding: 0.5rem;
+                background-color: var(--bg-primary);
+                border-radius: 0.5rem;
+                border: 1px solid var(--border);
             }
 
-            .progress-fill {
-                height: 100%;
-                background: linear-gradient(
-                    90deg,
-                    var(--success),
-                    var(--danger)
-                );
-                border-radius: 3px;
-                transition: width 0.3s ease;
+            .bank-count {
+                font-size: 1.25rem;
+                font-weight: 700;
+                color: var(--success);
+            }
+
+            .bank-label {
+                font-size: 0.875rem;
+                color: var(--text-muted);
             }
         </style>
     </head>
@@ -382,45 +468,86 @@
             </button>
         </div>
 
+        <div class="tabs">
+            <button class="tab active" id="watched-tab">Today's Videos</button>
+            <button class="tab" id="bank-tab">Video Bank</button>
+        </div>
+
         <div class="list-container">
-            <h2>
-                <svg
-                    class="list-icon"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                >
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.121 2.122"
-                    />
-                </svg>
-                Today's Videos
-            </h2>
-            <ol class="video-list" id="video-list"></ol>
-            <div id="no-videos-message" class="message">
-                <svg
-                    class="empty-icon"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                >
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m3 6V8a2 2 0 00-2-2H6a2 2 0 00-2 2v8a2 2 0 002 2h4"
-                    />
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M15 17l2 2 4-4"
-                    />
-                </svg>
-                <span>No videos watched yet today</span>
+            <!-- Watched Videos Tab -->
+            <div id="watched-container">
+                <h2>
+                    <svg
+                        class="list-icon"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.121 2.122"
+                        />
+                    </svg>
+                    Today's Videos
+                </h2>
+                <ol class="video-list" id="watched-list"></ol>
+                <div id="no-watched-message" class="message">
+                    <svg
+                        class="empty-icon"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M7 4V2a1 1 0 011-1h8a1 1 0 011 1v2m3 6V8a2 2 0 00-2-2H6a2 2 0 00-2 2v8a2 2 0 002 2h4"
+                        />
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M15 17l2 2 4-4"
+                        />
+                    </svg>
+                    <span>No videos watched yet today</span>
+                </div>
+            </div>
+
+            <!-- Video Bank Tab -->
+            <div id="bank-container" style="display: none">
+                <div class="bank-stats">
+                    <div>
+                        <div class="bank-count" id="bank-count">0</div>
+                        <div class="bank-label">/ 3 Banked</div>
+                    </div>
+                    <div class="bank-label">Videos saved for later</div>
+                </div>
+
+                <ol class="video-list" id="bank-list"></ol>
+                <div id="no-bank-message" class="message">
+                    <svg
+                        class="empty-icon"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"
+                        />
+                    </svg>
+                    <span>No videos in your bank yet</span>
+                    <small
+                        >Use the "Bank" button when watching videos to save them
+                        here</small
+                    >
+                </div>
             </div>
         </div>
 

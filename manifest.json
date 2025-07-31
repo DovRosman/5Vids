@@ -4,7 +4,7 @@
   "version": "1.0",
   "description": "Limits the number of YouTube videos you can watch to 5 per day.",
   "permissions": ["storage", "tabs", "webNavigation", "scripting"],
-  "host_permissions": ["*://*.youtube.com/*"],
+  "host_permissions": ["*://*.youtube.com/*", "https://i.postimg.cc/*"],
   "background": {
     "service_worker": "background.js"
   },
@@ -20,8 +20,8 @@
   ],
   "web_accessible_resources": [
     {
-      "resources": ["block.html"],
-      "matches": ["<all_urls>"]
+      "resources": ["block.html", "limit-reached.css"],
+      "matches": ["*://*.youtube.com/*"]
     }
   ]
 }

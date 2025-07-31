@@ -59,12 +59,60 @@ function removeVideo(videoId) {
   );
 }
 
+function removeVideoFromBank(videoId) {
+  chrome.runtime.sendMessage(
+    { action: "removeVideoFromBank", videoId: videoId },
+    (response) => {
+      if (response && response.success) {
+        updatePopup();
+      }
+    },
+  );
+}
+
+function createVideoItem(video, index, isBank = false) {
+  const listItem = document.createElement("li");
+  listItem.className = "video-item";
+
+  const thumbnail =
+    video.thumbnail || `https://i.ytimg.com/vi/${video.id}/mqdefault.jpg`;
+
+  listItem.innerHTML = `
+    <img src="${thumbnail}"
+         alt="Video thumbnail"
+         class="video-thumbnail"
+         loading="lazy">
+    <div class="${isBank ? "bank-number" : "video-number"}">${index + 1}</div>
+    <a href="https://www.youtube.com/watch?v=${video.id}"
+       target="_blank"
+       title="${video.title}"
+       class="video-link">${video.title}</a>
+    <button class="action-btn delete-btn"
+            title="Remove video"
+            data-video-id="${video.id}">
+      <svg class="action-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+              d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+      </svg>
+    </button>
+  `;
+
+  return listItem;
+}
+
 function updatePopup() {
   chrome.storage.local.get(
-    ["watchedVideosToday", "lastResetDate", "extensionEnabled", "darkMode"],
+    [
+      "watchedVideosToday",
+      "videoBank",
+      "lastResetDate",
+      "extensionEnabled",
+      "darkMode",
+    ],
     (data) => {
       const today = getTodayDateString();
       let watchedVideos = data.watchedVideosToday || [];
+      let videoBank = data.videoBank || [];
 
       if (data.lastResetDate !== today) {
         watchedVideos = [];
@@ -84,60 +132,106 @@ function updatePopup() {
         videoCountElement.textContent = watchedVideos.length;
       }
 
+      // Update bank count
+      const bankCountElement = document.getElementById("bank-count");
+      if (bankCountElement) {
+        bankCountElement.textContent = videoBank.length;
+      }
+
       // Update progress bar
       updateProgressBar(watchedVideos.length);
 
-      // Render the watched videos list
-      const listElement = document.getElementById("video-list");
-      const messageElement = document.getElementById("no-videos-message");
+      // Render watched videos
+      renderWatchedVideos(watchedVideos);
 
-      listElement.innerHTML = ""; // Clear previous items
-
-      if (watchedVideos.length > 0) {
-        messageElement.style.display = "none";
-        listElement.style.display = "flex";
-
-        watchedVideos.forEach((video, index) => {
-          const listItem = document.createElement("li");
-          listItem.className = "video-item";
-
-          listItem.innerHTML = `
-          <div class="video-number">${index + 1}</div>
-          <a href="https://www.youtube.com/watch?v=${video.id}"
-             target="_blank"
-             title="${video.title}"
-             class="video-link">${video.title}</a>
-          <button class="delete-btn"
-                  title="Remove video"
-                  data-video-id="${video.id}">
-            <svg class="delete-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                    d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
-            </svg>
-          </button>
-        `;
-
-          listElement.appendChild(listItem);
-        });
-
-        // Add event listeners to delete buttons
-        listElement.querySelectorAll(".delete-btn").forEach((btn) => {
-          btn.addEventListener("click", (e) => {
-            e.preventDefault();
-            const videoId = btn.getAttribute("data-video-id");
-            removeVideo(videoId);
-          });
-        });
-      } else {
-        messageElement.style.display = "flex";
-        listElement.style.display = "none";
-      }
+      // Render bank videos
+      renderBankVideos(videoBank);
     },
   );
 }
 
+function renderWatchedVideos(watchedVideos) {
+  const listElement = document.getElementById("watched-list");
+  const messageElement = document.getElementById("no-watched-message");
+
+  listElement.innerHTML = ""; // Clear previous items
+
+  if (watchedVideos.length > 0) {
+    messageElement.style.display = "none";
+    listElement.style.display = "flex";
+
+    watchedVideos.forEach((video, index) => {
+      const listItem = createVideoItem(video, index, false);
+      listElement.appendChild(listItem);
+    });
+
+    // Add event listeners to action buttons
+    listElement.querySelectorAll(".delete-btn").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        const videoId = btn.getAttribute("data-video-id");
+        removeVideo(videoId);
+      });
+    });
+  } else {
+    messageElement.style.display = "flex";
+    listElement.style.display = "none";
+  }
+}
+
+function renderBankVideos(videoBank) {
+  const listElement = document.getElementById("bank-list");
+  const messageElement = document.getElementById("no-bank-message");
+
+  listElement.innerHTML = ""; // Clear previous items
+
+  if (videoBank.length > 0) {
+    messageElement.style.display = "none";
+    listElement.style.display = "flex";
+
+    videoBank.forEach((video, index) => {
+      const listItem = createVideoItem(video, index, true);
+      listElement.appendChild(listItem);
+    });
+
+    // Add event listeners to action buttons
+    listElement.querySelectorAll(".delete-btn").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        e.preventDefault();
+        const videoId = btn.getAttribute("data-video-id");
+        removeVideoFromBank(videoId);
+      });
+    });
+  } else {
+    messageElement.style.display = "flex";
+    listElement.style.display = "none";
+  }
+}
+
+function setupTabs() {
+  const watchedTab = document.getElementById("watched-tab");
+  const bankTab = document.getElementById("bank-tab");
+  const watchedContainer = document.getElementById("watched-container");
+  const bankContainer = document.getElementById("bank-container");
+
+  watchedTab.addEventListener("click", () => {
+    watchedTab.classList.add("active");
+    bankTab.classList.remove("active");
+    watchedContainer.style.display = "block";
+    bankContainer.style.display = "none";
+  });
+
+  bankTab.addEventListener("click", () => {
+    bankTab.classList.add("active");
+    watchedTab.classList.remove("active");
+    watchedContainer.style.display = "none";
+    bankContainer.style.display = "block";
+  });
+}
+
 // Initialize popup
 document.addEventListener("DOMContentLoaded", () => {
+  setupTabs();
   updatePopup();
 
   // Extension toggle handler
@@ -172,6 +266,7 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
   if (namespace === "local") {
     if (
       changes.watchedVideosToday ||
+      changes.videoBank ||
       changes.extensionEnabled ||
       changes.darkMode
     ) {

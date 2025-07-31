@@ -9,13 +9,13 @@
   let overlay = null;
 
   // Create the overlay HTML
-  function createOverlay(videoTitle, currentCount) {
+  function createOverlay(videoTitle, currentCount, bankCount, bankRemaining) {
     const overlayHTML = `
             <div id="yt-limit-overlay" style="
                 position: fixed;
                 top: 20px;
                 right: 20px;
-                width: 320px;
+                width: 350px;
                 background: linear-gradient(135deg, rgba(31, 41, 55, 0.98), rgba(55, 65, 81, 0.98));
                 backdrop-filter: blur(20px);
                 border: 1px solid rgba(255, 255, 255, 0.1);
@@ -62,7 +62,7 @@
                     }
 
                     .yt-limit-btn {
-                        padding: 8px 16px;
+                        padding: 10px 16px;
                         border: none;
                         border-radius: 8px;
                         font-weight: 600;
@@ -90,6 +90,26 @@
                         background: linear-gradient(135deg, #059669, #047857);
                     }
 
+                    .yt-limit-btn-bank {
+                        background: linear-gradient(135deg, #3b82f6, #2563eb);
+                        color: white;
+                    }
+
+                    .yt-limit-btn-bank:hover {
+                        background: linear-gradient(135deg, #2563eb, #1d4ed8);
+                    }
+
+                    .yt-limit-btn-bank:disabled {
+                        background: #6b7280;
+                        cursor: not-allowed;
+                        opacity: 0.6;
+                    }
+
+                    .yt-limit-btn-bank:disabled:hover {
+                        transform: none;
+                        background: #6b7280;
+                    }
+
                     .yt-limit-btn-no {
                         background: linear-gradient(135deg, #ef4444, #dc2626);
                         color: white;
@@ -97,6 +117,40 @@
 
                     .yt-limit-btn-no:hover {
                         background: linear-gradient(135deg, #dc2626, #b91c1c);
+                    }
+
+                    .stats-row {
+                        display: flex;
+                        gap: 12px;
+                        margin-bottom: 12px;
+                    }
+
+                    .stat-item {
+                        flex: 1;
+                        text-align: center;
+                        padding: 8px;
+                        background: rgba(255, 255, 255, 0.1);
+                        border-radius: 8px;
+                        border: 1px solid rgba(255, 255, 255, 0.15);
+                    }
+
+                    .stat-value {
+                        font-size: 16px;
+                        font-weight: 700;
+                        color: #f3f4f6;
+                        display: block;
+                    }
+
+                    .stat-label {
+                        font-size: 10px;
+                        color: rgba(255, 255, 255, 0.7);
+                        text-transform: uppercase;
+                        letter-spacing: 0.5px;
+                        margin-top: 2px;
+                    }
+
+                    .bank-stat .stat-value {
+                        color: #3b82f6;
                     }
                 </style>
 
@@ -134,11 +188,22 @@
                             font-size: 15px;
                             color: #f3f4f6;
                             margin-bottom: 4px;
-                        ">Count This Video?</div>
+                        ">What to do with this video?</div>
                         <div style="
                             font-size: 12px;
                             color: rgba(255, 255, 255, 0.7);
-                        ">${currentCount}/5 videos today</div>
+                        ">Choose wisely!</div>
+                    </div>
+                </div>
+
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <span class="stat-value">${currentCount}/5</span>
+                        <span class="stat-label">Today</span>
+                    </div>
+                    <div class="stat-item bank-stat">
+                        <span class="stat-value">${bankCount}/3</span>
+                        <span class="stat-label">Bank</span>
                     </div>
                 </div>
 
@@ -153,18 +218,27 @@
                     overflow: hidden;
                 " title="${videoTitle}">${videoTitle}</div>
 
-                <div style="display: flex; gap: 10px;">
+                <div style="display: flex; gap: 8px; margin-bottom: 10px;">
                     <button class="yt-limit-btn yt-limit-btn-yes" id="count-video-btn">
                         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
                         </svg>
                         Count It
                     </button>
+                    <button class="yt-limit-btn yt-limit-btn-bank" id="bank-video-btn" ${bankRemaining <= 0 ? "disabled" : ""}>
+                        <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+                        </svg>
+                        Bank
+                    </button>
+                </div>
+
+                <div style="display: flex; gap: 8px;">
                     <button class="yt-limit-btn yt-limit-btn-no" id="skip-video-btn">
                         <svg width="16" height="16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
                         </svg>
-                        Skip
+                        Skip & Go Back
                     </button>
                 </div>
 
@@ -173,7 +247,7 @@
                     font-size: 11px;
                     color: rgba(255, 255, 255, 0.5);
                     text-align: center;
-                ">Press Y to count, N to skip</div>
+                ">Y: Count | B: Bank | N: Skip</div>
             </div>
         `;
 
@@ -228,9 +302,11 @@
 
     // Add event listeners
     const countBtn = overlay.querySelector("#count-video-btn");
+    const bankBtn = overlay.querySelector("#bank-video-btn");
     const skipBtn = overlay.querySelector("#skip-video-btn");
 
     countBtn.addEventListener("click", () => countVideo(videoId, videoTitle));
+    bankBtn.addEventListener("click", () => bankVideo(videoId, videoTitle));
     skipBtn.addEventListener("click", () => skipVideo());
 
     // Keyboard shortcuts
@@ -238,6 +314,11 @@
       if (e.key === "y" || e.key === "Y") {
         e.preventDefault();
         countVideo(videoId, videoTitle);
+      } else if (e.key === "b" || e.key === "B") {
+        e.preventDefault();
+        if (!bankBtn.disabled) {
+          bankVideo(videoId, videoTitle);
+        }
       } else if (e.key === "n" || e.key === "N") {
         e.preventDefault();
         skipVideo();
@@ -264,6 +345,26 @@
       },
       (response) => {
         console.log("Video counted:", response);
+      },
+    );
+
+    removeOverlay();
+  }
+
+  // Bank the video (user chose to bank)
+  function bankVideo(videoId, videoTitle) {
+    if (decisionMade) return;
+    decisionMade = true;
+
+    // Send message to background script
+    chrome.runtime.sendMessage(
+      {
+        action: "addVideoToBank",
+        videoId: videoId,
+        videoTitle: videoTitle,
+      },
+      (response) => {
+        console.log("Video banked:", response);
       },
     );
 
@@ -327,7 +428,10 @@
   // Check if this is a new video and show overlay if needed
   function checkVideoAndShowOverlay() {
     const url = window.location.href;
-    if (!url.includes("youtube.com/watch?v=")) return;
+    if (!url.includes("youtube.com/watch")) {
+      currentVideoId = null; // Reset when we navigate away from a watch page
+      return;
+    }
 
     const videoId = new URL(url).searchParams.get("v");
     if (!videoId || videoId === currentVideoId) return;
@@ -337,23 +441,41 @@
 
     // Wait a bit for page to load, then get video title and show overlay
     setTimeout(() => {
-      chrome.runtime.sendMessage(
-        {
-          action: "checkVideoStatus",
-          videoId: videoId,
-        },
-        (response) => {
-          if (response && response.shouldShowOverlay) {
-            const videoTitle = getVideoTitle();
-            const overlayElement = createOverlay(
-              videoTitle,
-              response.currentCount,
-            );
-            startTimer(overlayElement, videoId, videoTitle);
-          }
-        },
-      );
-    }, 1000);
+      // The background script now handles redirection proactively.
+      // This message is just to check if we should show the overlay.
+      if (chrome.runtime && chrome.runtime.sendMessage) {
+        chrome.runtime.sendMessage(
+          {
+            action: "checkVideoStatus",
+            videoId: videoId,
+          },
+          (response) => {
+            if (chrome.runtime.lastError) {
+              // This can happen if the extension context is invalidated.
+              // The background script's webNavigation listener will handle redirection.
+              console.log("5Vids: " + chrome.runtime.lastError.message);
+              return;
+            }
+            if (response && response.shouldShowOverlay) {
+              const videoTitle = getVideoTitle();
+              const overlayElement = createOverlay(
+                videoTitle,
+                response.currentCount,
+                response.bankCount,
+                response.bankRemaining,
+              );
+              startTimer(overlayElement, videoId, videoTitle);
+            }
+          },
+        );
+      } else {
+        // The chrome.runtime object is not available. This can happen during an extension reload.
+        // The background script's webNavigation listener should handle this case.
+        console.log(
+          "5Vids: Extension context not available. Background script will handle redirection if needed.",
+        );
+      }
+    }, 500); // Reduced timeout to be more responsive
   }
 
   // Listen for URL changes (YouTube is a SPA)
